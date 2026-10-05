@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta name="viewport" content="width=device\-width, initial\-scale=1"\>
+<title\>MemberGift Admin</title\>
+<style\>
+    body \{
+        font\-family: Arial, sans\-serif;
+        background: \#f2f4f7;
+        padding: 20px;
+    \}
+    h1 \{
+        color: \#075e54;
+    \}
+    input \{
+        width: 100%;
+        box\-sizing: border\-box;
+        padding: 12px;
+        margin\-top: 10px;
+        border: 1px solid \#ccc;
+        border\-radius: 8px;
+    \}
+    button \{
+        padding: 10px 15px;
+        border: none;
+        border\-radius: 8px;
+        background: \#075e54;
+        color: white;
+        margin\-top: 8px;
+    \}
+    \.member \{
+        background: white;
+        padding: 15px;
+        margin\-top: 15px;
+        border\-radius: 12px;
+        box\-shadow: 0 2px 8px \#0002;
+    \}
+    \.gift \{
+        color: \#d18b00;
+        font\-weight: bold;
+        margin\-top: 8px;
+    \}
+    \.taken \{
+        color: green;
+        font\-weight: bold;
+        margin\-top: 8px;
+    \}
+    \.hasil \{
+        margin\-top: 15px;
+    \}
+</style\>
+
+</head>
+
+<body>
+
+<h1\>🎁 MemberGift</h1\>
+<p\>Aplikasi Admin Member</p\>
+<button onclick="tambahMember&#40;&#41;"\>\+ Tambah Member</button\>
+<h3\>🔎 Cari Member</h3\>
+<input
+    id="inputID"
+    type="text"
+    placeholder="Masukkan ID Member"
+\>
+<button onclick="cariMember&#40;&#41;"\>Cari Member</button\>
+<div id="hasilPencarian" class="hasil"\></div\>
+<hr\>
+<div id="daftarMember"\></div\>
+
+<script>
+
+// Ambil data yang tersimpan
+
+let members = JSON.parse(
+
+localStorage\.getItem&#40;"members"&#41;
+
+) || [];
+
+// Simpan data
+
+function simpanData() {
+
+localStorage\.setItem&#40;
+    "members",
+    JSON\.stringify&#40;members&#41;
+&#41;;
+
+}
+
+// Tambah member
+
+function tambahMember() {
+
+let nama = prompt&#40;"Masukkan nama member:"&#41;;
+if &#40;\!nama&#41; \{
+    return;
+\}
+let idMember = "MG\-" \+ Math\.random&#40;&#41;
+    \.toString&#40;36&#41;
+    \.substring&#40;2, 10&#41;
+    \.toUpperCase&#40;&#41;;
+let member = \{
+    nama: nama,
+    id: idMember,
+    pembelian: 0,
+    gift3: false,
+    gift7: false,
+    gift10: false
+\};
+members\.push&#40;member&#41;;
+simpanData&#40;&#41;;
+tampilkanMember&#40;&#41;;
+alert&#40;
+    "Member berhasil ditambahkan\!\\n\\n" \+
+    "Nama: " \+ nama \+
+    "\\nID Member: " \+ idMember
+&#41;;
+
+}
+
+// Tambah pembelian
+
+function tambahPembelian(index) {
+
+let member = members&#91;index&#93;;
+if &#40;member\.pembelian \>= 10&#41; \{
+    alert&#40;"Kartu sudah mencapai 10 pembelian\."&#41;;
+    return;
+\}
+member\.pembelian\+\+;
+simpanData&#40;&#41;;
+tampilkanMember&#40;&#41;;
+if &#40;
+    member\.pembelian === 3 \|\|
+    member\.pembelian === 7 \|\|
+    member\.pembelian === 10
+&#41; \{
+    alert&#40;
+        "🎁 SELAMAT\!\\n\\n" \+
+        member\.nama \+
+        " mendapatkan GIFT pada pembelian ke\-" \+
+        member\.pembelian
+    &#41;;
+\}
+
+}
+
+// Ambil gift
+
+function ambilGift(index, nomorGift) {
+
+let member = members&#91;index&#93;;
+if &#40;nomorGift === 3&#41; \{
+    member\.gift3 = true;
+\}
+if &#40;nomorGift === 7&#41; \{
+    member\.gift7 = true;
+\}
+if &#40;nomorGift === 10&#41; \{
+    member\.gift10 = true;
+\}
+simpanData&#40;&#41;;
+tampilkanMember&#40;&#41;;
+
+}
+
+// Cari member
+
+function cariMember() {
+
+let idDicari = document
+    \.getElementById&#40;"inputID"&#41;
+    \.value
+    \.trim&#40;&#41;
+    \.toUpperCase&#40;&#41;;
+let hasil = document\.getElementById&#40;"hasilPencarian"&#41;;
+let member = members\.find&#40;function&#40;item&#41; \{
+    return item\.id === idDicari;
+\}&#41;;
+if &#40;\!member&#41; \{
+    hasil\.innerHTML =
+        "<div class='member'\>" \+
+        "❌ Member tidak ditemukan\." \+
+        "</div\>";
+    return;
+\}
+hasil\.innerHTML =
+    "<div class='member'\>" \+
+    "<h3\>👤 " \+ member\.nama \+ "</h3\>" \+
+    "<div\>🆔 " \+ member\.id \+ "</div\>" \+
+    "<div\>🛒 Pembelian: " \+
+    member\.pembelian \+
+    "/10</div\>" \+
+    "</div\>";
+
+}
+
+// Tampilkan semua member
+
+function tampilkanMember() {
+
+let daftar =
+    document\.getElementById&#40;"daftarMember"&#41;;
+daftar\.innerHTML = "";
+members\.forEach&#40;function&#40;member, index&#41; \{
+    let hadiah = "";
+    if &#40;member\.pembelian \>= 3&#41; \{
+        if &#40;member\.gift3&#41; \{
+            hadiah \+=
+                "<div class='taken'\>" \+
+                "✅ Gift ke\-3 sudah diambil" \+
+                "</div\>";
+        \} else \{
+            hadiah \+=
+                "<div class='gift'\>" \+
+                "🎁 Gift ke\-3 tersedia" \+
+                "</div\>" \+
+                "<button onclick='ambilGift&#40;" \+
+                index \+
+                ",3&#41;'\>" \+
+                "Gift Sudah Diambil" \+
+                "</button\>";
+        \}
+    \}
+    if &#40;member\.pembelian \>= 7&#41; \{
+        if &#40;member\.gift7&#41; \{
+            hadiah \+=
+                "<div class='taken'\>" \+
+                "✅ Gift ke\-7 sudah diambil" \+
+                "</div\>";
+        \} else \{
+            hadiah \+=
+                "<div class='gift'\>" \+
+                "🎁 Gift ke\-7 tersedia" \+
+                "</div\>" \+
+                "<button onclick='ambilGift&#40;" \+
+                index \+
+                ",7&#41;'\>" \+
+                "Gift Sudah Diambil" \+
+                "</button\>";
+        \}
+    \}
+    if &#40;member\.pembelian \>= 10&#41; \{
+        if &#40;member\.gift10&#41; \{
+            hadiah \+=
+                "<div class='taken'\>" \+
+                "✅ Gift ke\-10 sudah diambil" \+
+                "</div\>";
+        \} else \{
+            hadiah \+=
+                "<div class='gift'\>" \+
+                "🏆 Gift ke\-10 tersedia" \+
+                "</div\>" \+
+                "<button onclick='ambilGift&#40;" \+
+                index \+
+                ",10&#41;'\>" \+
+                "Gift Sudah Diambil" \+
+                "</button\>";
+        \}
+    \}
+    daftar\.innerHTML \+=
+        "<div class='member'\>" \+
+        "<h3\>👤 " \+
+        member\.nama \+
+        "</h3\>" \+
+        "<div\>🆔 " \+
+        member\.id \+
+        "</div\>" \+
+        "<div\>🛒 Pembelian: " \+
+        member\.pembelian \+
+        "/10</div\>" \+
+        hadiah \+
+        "<button onclick='tambahPembelian&#40;" \+
+        index \+
+        "&#41;'\>" \+
+        "\+1 Pembelian" \+
+        "</button\>" \+
+        "</div\>";
+\}&#41;;
+
+}
+
+// Tampilkan data ketika halaman dibuka
+
+tampilkanMember();
+
+</script>
+
+</body>
+
+</html>
